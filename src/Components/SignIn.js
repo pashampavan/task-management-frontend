@@ -24,21 +24,38 @@ useEffect(()=>{
     setError("");
     setSuccess("");
 
+    if(type=="signin")
+    {
     try {
-        
-        const response = await axios.post("http://localhost:5000/login/", {
-            "email":email,
-            "password":password
+
+          const response = await axios.post("http://localhost:5000/login/", {
+              "email":email,
+              "password":password
+          });
+          
+        // Save JWT token to localStorage or context
+        const token = response.data.token;
+        localStorage.setItem("token", token);
+        setSuccess("SignIn successful!");
+        setLogin(true);
+        navigate('/dashboard');
+      } catch (err) {
+        setError(err.response?.data?.message || "SignIn failed");
+      }
+    }else
+    {
+      try
+      {
+        const response = await axios.post("http://localhost:5000/register/", {
+          "email":email,
+          "name":name,
+          "password":password
         });
-        
-      // Save JWT token to localStorage or context
-      const token = response.data.token;
-      localStorage.setItem("token", token);
-      setSuccess("SignIn successful!");
-      setLogin(true);
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err.response?.data?.message || "SignIn failed");
+        setSuccess("SignUp successful!");
+        navigate("/dashboard")
+      }catch (err) {
+        setError(err.response?.data?.message || "SignUp failed");
+      }
     }
   };
 
@@ -74,14 +91,17 @@ useEffect(()=>{
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
-        <TextField
-          label="Name"
-          type="text"
-          variant="outlined"
-          fullWidth
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-        />
+        {type=="signin"?<></>:<TextField
+        label="Name"
+        type="text"
+        variant="outlined"
+        fullWidth
+        value={name}
+        onChange={(e) => setName(e.target.value)}
+      />
+
+        }
+        
         <TextField
           label="Password"
           type="password"
@@ -95,6 +115,7 @@ useEffect(()=>{
           variant="contained"
           color="primary"
           fullWidth
+          onClick={handleSignIn}
         >
           {type=="signin"?<>SignIn</>:<>signUp</>}
         </Button>
