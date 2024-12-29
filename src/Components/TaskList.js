@@ -167,6 +167,13 @@ const TaskList = () => {
   const sortedByStartTime = tasks
   .slice() 
   .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+  setTasks(sortedByStartTime);
+  }
+  const handleSortByEndTime=()=>{
+  const sortedByStartTime = tasks
+  .slice() 
+  .sort((a, b) => new Date(a.end_time) - new Date(b.end_time));
+  setTasks(sortedByStartTime);
   }
   const handleSortByPriority=()=>{
     const sortedByPriority = tasks
@@ -198,7 +205,15 @@ const TaskList = () => {
           size="small"
           onClick={() => handleSortByTime()}
         >
-          Sort By Time
+          Sort By Start Time
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={() => handleSortByEndTime()}
+        >
+          Sort By End Time
         </Button>
         <Button
           variant="contained"

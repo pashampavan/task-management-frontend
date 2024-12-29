@@ -1,36 +1,65 @@
-import React, { useEffect,useContext} from "react";
+import React, { useEffect, useContext, useState } from "react";
 import { Box, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
-import context from '../Context/useContext';
+import context from "../Context/useContext";
+
 const Dashboard = () => {
   const navigate = useNavigate();
-  const {login,setLogin}=useContext(context);
-  useEffect(()=>{
-    if(!localStorage.getItem("token"))
-    {
-      navigate('/');
+  const { login, setLogin } = useContext(context);
+  const [statistics, setStatistics] = useState({
+    summaryData: [],
+    pendingSummaryData: [],
+    taskPriorityData: [],
+  });
+
+  useEffect(() => {
+    // Check for authentication
+    if (!localStorage.getItem("token")) {
+      navigate("/");
+    } else {
+      // Fetch user statistics
+      const fetchStatistics = async () => {
+        try {
+          const response = await fetch("http://localhost:5000/tasks/statistics", {
+            method: "GET",
+            headers: {
+              "Content-Type": "application/json",
+              Authorization: `Bearer ${localStorage.getItem("token")}`,
+            },
+          });
+          const data = await response.json();
+          if (response.ok) {
+            // Map API data to match the UI structure
+            setStatistics({
+              summaryData: [
+                { label: "Total tasks", value: data.statistics.totalTasks },
+                { label: "Tasks completed", value: `${data.statistics.taskCompletionPercentage}%` },
+                { label: "Tasks pending", value: `${data.statistics.taskPendingPercentage}%` },
+                { label: "Average time per completed task", value: `${data.statistics.averageTimePerCompletedTask} hrs` },
+              ],
+              pendingSummaryData: [
+                { label: "Pending tasks", value: data.statistics.pendingTasks },
+                { label: "Total time lapsed", value: `${data.statistics.totalPendingTime} hrs` },
+                { label: "Total time to finish", value: `${data.statistics.totalEstimatedCompletionTime} hrs (estimated based on end time)` },
+              ],
+              taskPriorityData: Object.entries(data.statistics.prioritySummary).map(([priority, details]) => ({
+                priority,
+                pending: details.pending,
+                lapsed: details.timeLapsed,
+                finish: details.timeToFinish,
+              })),
+            });
+          } else {
+            console.error("Failed to fetch statistics:", data.message);
+          }
+        } catch (error) {
+          console.error("Error fetching statistics:", error.message);
+        }
+      };
+
+      fetchStatistics();
     }
-  },[login])
-  const summaryData = [
-    { label: "Total tasks", value: "25" },
-    { label: "Tasks completed", value: "40%" },
-    { label: "Tasks pending", value: "60%" },
-    { label: "Average time per completed task", value: "3.5 hrs" },
-  ];
-
-  const pendingSummaryData = [
-    { label: "Pending tasks", value: "15" },
-    { label: "Total time lapsed", value: "56 hrs" },
-    { label: "Total time to finish", value: "24 hrs (estimated based on end time)" },
-  ];
-
-  const taskPriorityData = [
-    { priority: 1, pending: 3, lapsed: 12, finish: 8 },
-    { priority: 2, pending: 5, lapsed: 6, finish: 3 },
-    { priority: 3, pending: 1, lapsed: 8, finish: 7 },
-    { priority: 4, pending: 0, lapsed: 0, finish: 0 },
-    { priority: 5, pending: 6, lapsed: 30, finish: 6 },
-  ];
+  }, [login, navigate]);
 
   return (
     <Box sx={{ p: 3 }}>
@@ -43,7 +72,7 @@ const Dashboard = () => {
           Summary
         </Typography>
         <Grid container spacing={2}>
-          {summaryData.map((item, index) => (
+          {statistics.summaryData.map((item, index) => (
             <Grid item xs={6} sm={3} key={index}>
               <Box sx={{ textAlign: "center", p: 2, bgcolor: "#f5f5f5", borderRadius: 2 }}>
                 <Typography variant="h5" color="primary">
@@ -62,7 +91,7 @@ const Dashboard = () => {
           Pending Task Summary
         </Typography>
         <Grid container spacing={2}>
-          {pendingSummaryData.map((item, index) => (
+          {statistics.pendingSummaryData.map((item, index) => (
             <Grid item xs={12} sm={4} key={index}>
               <Box sx={{ textAlign: "center", p: 2, bgcolor: "#f5f5f5", borderRadius: 2 }}>
                 <Typography variant="h5" color="primary">
@@ -91,7 +120,7 @@ const Dashboard = () => {
               </TableRow>
             </TableHead>
             <TableBody>
-              {taskPriorityData.map((row, index) => (
+              {statistics.taskPriorityData.map((row, index) => (
                 <TableRow key={index}>
                   <TableCell>{row.priority}</TableCell>
                   <TableCell>{row.pending}</TableCell>
