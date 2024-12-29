@@ -72,6 +72,9 @@ const Dashboard = () => {
           Summary
         </Typography>
         <Grid container spacing={2}>
+          {/* {
+            statistics.summaryData
+          } */}
           {statistics.summaryData.map((item, index) => (
             <Grid item xs={6} sm={3} key={index}>
               <Box sx={{ textAlign: "center", p: 2, bgcolor: "#f5f5f5", borderRadius: 2 }}>
