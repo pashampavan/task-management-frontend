@@ -1,6 +1,6 @@
-import React,{useContext,useEffect} from "react";
+import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import context from '../Context/useContext';
+import context from "../Context/useContext";
 import {
   Box,
   Button,
@@ -10,133 +10,213 @@ import {
   Grid,
   Chip,
   Stack,
-  IconButton,
-  Menu,
-  MenuItem,
   Dialog,
   DialogTitle,
   DialogContent,
+  DialogActions,
   TextField,
   FormControl,
   InputLabel,
   Select,
   MenuItem as SelectMenuItem,
   Switch,
-  DialogActions,
 } from "@mui/material";
-import SortIcon from "@mui/icons-material/Sort";
+import axios from "axios";
 
 const TaskList = () => {
-  const {login,setLogin}=useContext(context);
-  const navigate=useNavigate();
-  useEffect(()=>{
-    if(!localStorage.getItem("token"))
-    {
-      navigate('/');
+  const { login } = useContext(context);
+  const navigate = useNavigate();
+
+  // State variables
+  const [tasks, setTasks] = useState([]);
+  const [openDialog, setOpenDialog] = useState(false);
+  const [editMode, setEditMode] = useState(false);
+  const [currentTaskId, setCurrentTaskId] = useState(null);
+  const [newTask, setNewTask] = useState({
+    title: "",
+    priority: 1,
+    status: false,
+    start: "",
+    end: "",
+  });
+
+  useEffect(() => {
+    if (!localStorage.getItem("token")) {
+      navigate("/");
+    } else {
+      fetchTasks();
     }
-  },[login])
-  const tasks = [
-    {
-      id: 1,
-      title: "Buy clothes",
-      status: "Pending",
-      priority: 5,
-      start: "26-Nov-24 11:00 AM",
-      end: "30-Nov-24 11:00 AM",
-    },
-    {
-      id: 2,
-      title: "Finish code",
-      status: "Finished",
-      priority: 2,
-      start: "25-Nov-24 09:05 AM",
-      end: "25-Nov-24 03:15 PM",
-    },
-    {
-      id: 3,
-      title: "Book travel tickets",
-      status: "Pending",
-      priority: 4,
-      start: "20-Nov-24 11:00 PM",
-      end: "25-Nov-24 11:00 PM",
-    },
-    {
-      id: 4,
-      title: "Order groceries",
-      status: "Finished",
-      priority: 3,
-      start: "14-Oct-24 10:30 AM",
-      end: "16-Oct-24 10:30 PM",
-    },
-    {
-      id: 5,
-      title: "Medical checkup",
-      status: "Pending",
-      priority: 1,
-      start: "19-Nov-24 01:15 PM",
-      end: "21-Dec-24 05:00 PM",
-    },
-  ];
+  }, [login]);
 
-  // Sort Menu
-  const [anchorEl, setAnchorEl] = React.useState(null);
-  const openSort = Boolean(anchorEl);
-
-  const handleSortClick = (event) => {
-    setAnchorEl(event.currentTarget);
-  };
-  const handleSortClose = () => {
-    setAnchorEl(null);
+  // useEffect(()=>{
+  //   tasks = tasks
+  // .slice() 
+  // .sort((a, b) => a.priority - b.priority);
+  // },)
+  // Fetch tasks
+  const fetchTasks = async () => {
+    try {
+      const response = await axios.get("http://localhost:5000/tasks", {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      setTasks(response.data);
+    } catch (error) {
+      console.error("Error fetching tasks:", error);
+    }
   };
 
-  // Add Task Dialog
-  const [openDialog, setOpenDialog] = React.useState(false);
-
-  const handleDialogOpen = () => {
+  // Handle Add/Edit Task Dialog open/close
+  const handleDialogOpen = (task = null) => {
+    if (task) {
+      setEditMode(true);
+      setCurrentTaskId(task._id);
+      setNewTask({
+        title: task.title,
+        priority: task.priority,
+        status: task.status === "Finished",
+        start:task.start_time,
+        end:task.end_time,
+      });
+    } else {
+      setEditMode(false);
+      setNewTask({
+        title: "",
+        priority: 1,
+        status: false,
+        start: "",
+        end: "",
+      });
+    }
     setOpenDialog(true);
   };
 
   const handleDialogClose = () => {
     setOpenDialog(false);
+    setNewTask({
+      title: "",
+      priority: 1,
+      status: false,
+      start: "",
+      end: "",
+    });
+    setEditMode(false);
   };
 
+  // Handle Add/Edit Task
+  const handleSaveTask = async () => {
+    try {
+      if (editMode) {
+        // Edit Task
+        await axios.put(
+          `http://localhost:5000/tasks/${currentTaskId}`,
+          {
+            ...newTask,
+            status: newTask.status ? "Finished" : "Pending",
+          },
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          }
+        );
+      } else {
+        // Add Task
+        await axios.post(
+          "http://localhost:5000/tasks",
+          {
+            ...newTask,
+            status: newTask.status ? "Finished" : "Pending",
+          },
+          {
+            headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+          }
+        );
+      }
+      fetchTasks();
+      handleDialogClose();
+    } catch (error) {
+      alert("Error saving task: " + error.message);
+      console.error("Error saving task:", error);
+    }
+  };
+
+  // Handle Delete Task
+  const handleDeleteTask = async (id) => {
+    try {
+      await axios.delete(`http://localhost:5000/tasks/${id}`, {
+        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      });
+      fetchTasks();
+    } catch (error) {
+      console.error("Error deleting task:", error);
+    }
+  };
+  function formatDate(dateString) {
+    const date = new Date(dateString);
+  
+    // Get day, month, year, hours, minutes, and seconds
+    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, '0'); // Month is 0-indexed
+    const year = date.getFullYear();
+    const hours = String(date.getHours()).padStart(2, '0');
+    const minutes = String(date.getMinutes()).padStart(2, '0');
+    const seconds = String(date.getSeconds()).padStart(2, '0');
+  
+    // Format as DD-MM-YYYY HR:MM:SS
+    return `${day}-${month}-${year} ${hours}:${minutes}:${seconds}`;
+  }
+  const handleSortByTime=()=>{
+  const sortedByStartTime = tasks
+  .slice() 
+  .sort((a, b) => new Date(a.start_time) - new Date(b.start_time));
+  }
+  const handleSortByPriority=()=>{
+    const sortedByPriority = tasks
+  .slice() // Make a shallow copy to avoid mutating the original array
+  .sort((a, b) => b.priority - a.priority);
+  setTasks(sortedByPriority);
+
+  }
   return (
     <Box sx={{ p: 3 }}>
-      {/* Header Section */}
-      <Stack direction="row" justifyContent="space-between" alignItems="center" sx={{ mb: 2 }}>
+      <Stack
+        direction="row"
+        justifyContent="space-between"
+        alignItems="center"
+        sx={{ mb: 2 }}
+      >
         <Typography variant="h4">Task List</Typography>
-        <Button variant="contained" color="primary" size="small" onClick={handleDialogOpen}>
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={() => handleSortByPriority()}
+        >
+          Sort By Priority
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={() => handleSortByTime()}
+        >
+          Sort By Time
+        </Button>
+        <Button
+          variant="contained"
+          color="primary"
+          size="small"
+          onClick={() => handleDialogOpen()}
+        >
           + Add Task
         </Button>
       </Stack>
 
-      {/* Sort Options */}
-      <Stack direction="row" justifyContent="flex-end" alignItems="center" sx={{ mb: 2 }}>
-        <IconButton onClick={handleSortClick}>
-          <SortIcon />
-        </IconButton>
-        <Typography sx={{ mr: 1 }}>Sort:</Typography>
-        <Button size="small" sx={{ mr: 1 }}>
-          Priority
-        </Button>
-        <Button size="small">Status</Button>
-        <Menu anchorEl={anchorEl} open={openSort} onClose={handleSortClose}>
-          <MenuItem onClick={handleSortClose}>Priority</MenuItem>
-          <MenuItem onClick={handleSortClose}>Status</MenuItem>
-        </Menu>
-      </Stack>
-
-      {/* Task Cards */}
       <Grid container spacing={2}>
         {tasks.map((task) => (
           <Grid item xs={12} sm={6} md={4} key={task.id}>
             <Card sx={{ border: "1px solid #ccc" }}>
               <CardContent>
                 <Typography variant="subtitle1" sx={{ fontWeight: "bold" }}>
-                  Task ID: {task.id} -{" "}
-                  <Typography component="span" sx={{ color: "#1976d2", cursor: "pointer" }}>
-                    {task.title}
-                  </Typography>
+                  {task.title}
                 </Typography>
                 <Chip
                   label={task.status}
@@ -148,15 +228,30 @@ const TaskList = () => {
                   Priority: {task.priority}
                 </Typography>
                 <Typography variant="body2">
-                  Start: {task.start}
-                  <br />
-                  End: {task.end}
+                  Start:{formatDate(task.start_time)}
                 </Typography>
-                <Stack direction="row" justifyContent="space-between" sx={{ mt: 2 }}>
-                  <Button size="small" variant="outlined">
+                  {/* <br /> */}
+                  <Typography variant="body2">
+                  End: {formatDate(task.end_time)}
+                    </Typography>
+                <Stack
+                  direction="row"
+                  justifyContent="space-between"
+                  sx={{ mt: 2 }}
+                >
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    onClick={() => handleDialogOpen(task)}
+                  >
                     Edit
                   </Button>
-                  <Button size="small" variant="outlined" color="error">
+                  <Button
+                    size="small"
+                    variant="outlined"
+                    color="error"
+                    onClick={() => handleDeleteTask(task._id)}
+                  >
                     Delete
                   </Button>
                 </Stack>
@@ -166,15 +261,26 @@ const TaskList = () => {
         ))}
       </Grid>
 
-      {/* Add Task Dialog */}
       <Dialog open={openDialog} onClose={handleDialogClose} fullWidth maxWidth="sm">
-        <DialogTitle>Add New Task</DialogTitle>
+        <DialogTitle>{editMode ? "Edit Task" : "Add Task"}</DialogTitle>
         <DialogContent>
           <Stack spacing={2}>
-            <TextField label="Title" fullWidth />
+            <TextField
+              label="Title"
+              fullWidth
+              value={newTask.title}
+              onChange={(e) =>
+                setNewTask({ ...newTask, title: e.target.value })
+              }
+            />
             <FormControl fullWidth>
               <InputLabel>Priority</InputLabel>
-              <Select>
+              <Select
+                value={newTask.priority}
+                onChange={(e) =>
+                  setNewTask({ ...newTask, priority: e.target.value })
+                }
+              >
                 {[1, 2, 3, 4, 5].map((priority) => (
                   <SelectMenuItem value={priority} key={priority}>
                     {priority}
@@ -184,26 +290,39 @@ const TaskList = () => {
             </FormControl>
             <Stack direction="row" justifyContent="space-between" alignItems="center">
               <Typography>Status</Typography>
-              <Switch />
+              <Switch
+                checked={newTask.status}
+                onChange={(e) =>
+                  setNewTask({ ...newTask, status: e.target.checked })
+                }
+              />
             </Stack>
             <TextField
               label="Start Time"
               type="datetime-local"
               InputLabelProps={{ shrink: true }}
               fullWidth
+              value={newTask.start ? new Date(newTask.start).toISOString().slice(0, 16) : ''}
+              onChange={(e) =>
+                setNewTask({ ...newTask, start: e.target.value })
+              }
             />
             <TextField
               label="End Time"
               type="datetime-local"
               InputLabelProps={{ shrink: true }}
               fullWidth
+              value={newTask.end? new Date(newTask.end).toISOString().slice(0, 16) : ''}
+              onChange={(e) =>
+                setNewTask({ ...newTask, end: e.target.value })
+              }
             />
           </Stack>
         </DialogContent>
         <DialogActions>
           <Button onClick={handleDialogClose}>Cancel</Button>
-          <Button variant="contained" onClick={handleDialogClose}>
-            Add Task
+          <Button variant="contained" onClick={()=>handleSaveTask(newTask.id)}>
+            {editMode ? "Update Task" : "Add Task"}
           </Button>
         </DialogActions>
       </Dialog>

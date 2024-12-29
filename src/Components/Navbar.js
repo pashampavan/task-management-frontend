@@ -1,10 +1,20 @@
-import React,{useContext} from "react";
+import React,{useContext, useEffect} from "react";
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import { Link,useNavigate } from "react-router-dom";
 import context from '../Context/useContext';
 const Navbar = () => {
   const navigate=useNavigate();
   const {login,setLogin}=useContext(context);
+  useEffect(()=>{
+    if(localStorage.getItem('token'))
+    {
+      setLogin(true);
+    }
+    else
+    {
+      setLogin(false);
+    }
+  },[])
   return (
     <AppBar position="static" color="primary">
       <Toolbar sx={{ justifyContent: "space-between" }}>
