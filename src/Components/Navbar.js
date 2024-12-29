@@ -1,7 +1,10 @@
-import React from "react";
+import React,{useContext} from "react";
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
-import { Link } from "react-router-dom";
+import { Link,useNavigate } from "react-router-dom";
+import context from '../Context/useContext';
 const Navbar = () => {
+  const navigate=useNavigate();
+  const {login,setLogin}=useContext(context);
   return (
     <AppBar position="static" color="primary">
       <Toolbar sx={{ justifyContent: "space-between" }}>
@@ -38,19 +41,30 @@ const Navbar = () => {
         </Box>
 
         {/* Right Section (Sign Out Button) */}
-        {localStorage.getItem('token')?<Button
+        {login?<Button
           variant="contained"
           color="secondary"
           size="small"
-          onClick={() => alert("Signed Out")} // Replace with your logout functionality
-        >
-          <span onClick={()=>{
+          onClick={()=>{
             localStorage.removeItem("token");
-
-          }}>
+            setLogin(false);
+          }} // Replace with your logout functionality
+        >
+          <span>
             Sign Out
             </span>
-        </Button>:<></>
+        </Button>:<Button
+          variant="contained"
+          color="secondary"
+          size="small"
+          onClick={()=>{
+            navigate('/signup')
+          }} // Replace with your logout functionality
+        >
+          <span>
+            Sign Up
+            </span>
+        </Button>
         }
       </Toolbar>
     </AppBar>

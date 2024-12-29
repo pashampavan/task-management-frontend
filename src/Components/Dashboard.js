@@ -1,7 +1,16 @@
-import React from "react";
+import React, { useEffect,useContext} from "react";
 import { Box, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
-
+import { useNavigate } from "react-router-dom";
+import context from '../Context/useContext';
 const Dashboard = () => {
+  const navigate = useNavigate();
+  const {login,setLogin}=useContext(context);
+  useEffect(()=>{
+    if(!localStorage.getItem("token"))
+    {
+      navigate('/');
+    }
+  },[login])
   const summaryData = [
     { label: "Total tasks", value: "25" },
     { label: "Tasks completed", value: "40%" },

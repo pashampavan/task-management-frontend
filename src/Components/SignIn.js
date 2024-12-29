@@ -1,8 +1,11 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState ,useContext} from "react";
 import { TextField, Button, Box, Typography, Alert } from "@mui/material";
 import axios from "axios";
 import { useNavigate } from 'react-router-dom'
-const SignIn = () => {
+import context from '../Context/useContext';
+
+const SignIn = ({type}) => {
+  const {login,setLogin}=useContext(context);
     const navigate = useNavigate();
 useEffect(()=>{
     if(localStorage.getItem('token'))
@@ -12,6 +15,7 @@ useEffect(()=>{
 },[])
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [name, setName] = useState("");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
 
@@ -27,10 +31,11 @@ useEffect(()=>{
             "password":password
         });
         
-        // Save JWT token to localStorage or context
+      // Save JWT token to localStorage or context
       const token = response.data.token;
       localStorage.setItem("token", token);
       setSuccess("SignIn successful!");
+      setLogin(true);
       navigate('/dashboard');
     } catch (err) {
       setError(err.response?.data?.message || "SignIn failed");
@@ -47,7 +52,10 @@ useEffect(()=>{
         gap: 2,
       }}
     >
-      <Typography variant="h4">SignIn</Typography>
+      <Typography variant="h4">
+        
+        {type=="signin"?<>SignIn</>:<>SignUp</>}
+        </Typography>
 
       {/* Error/Success Messages */}
       {error && <Alert severity="error">{error}</Alert>}
@@ -67,6 +75,14 @@ useEffect(()=>{
           onChange={(e) => setEmail(e.target.value)}
         />
         <TextField
+          label="Name"
+          type="text"
+          variant="outlined"
+          fullWidth
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <TextField
           label="Password"
           type="password"
           variant="outlined"
@@ -80,7 +96,7 @@ useEffect(()=>{
           color="primary"
           fullWidth
         >
-          SignIn
+          {type=="signin"?<>SignIn</>:<>signUp</>}
         </Button>
       </Box>
     </Box>

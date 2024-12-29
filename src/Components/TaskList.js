@@ -1,4 +1,6 @@
-import React from "react";
+import React,{useContext,useEffect} from "react";
+import { useNavigate } from "react-router-dom";
+import context from '../Context/useContext';
 import {
   Box,
   Button,
@@ -25,6 +27,14 @@ import {
 import SortIcon from "@mui/icons-material/Sort";
 
 const TaskList = () => {
+  const {login,setLogin}=useContext(context);
+  const navigate=useNavigate();
+  useEffect(()=>{
+    if(!localStorage.getItem("token"))
+    {
+      navigate('/');
+    }
+  },[login])
   const tasks = [
     {
       id: 1,
