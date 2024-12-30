@@ -12,6 +12,7 @@ function App() {
     <div className="App">
       <Navbar/>
       <Routes >
+        <Route  path='/*' element={<SignIn type="signin"/>}/>
         <Route  path='/' element={<SignIn type="signin"/>}/>
         <Route  path='/task-management-frontend' element={<SignIn type="signin"/>}/>
         <Route  path='/dashboard' element={<Dashboard/>}/>
