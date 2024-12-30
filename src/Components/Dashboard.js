@@ -17,7 +17,7 @@ const Dashboard = () => {
       // Fetch user statistics
       const fetchStatistics = async () => {
         try {
-          const response = await fetch("http://localhost:5000/tasks/statistics", {
+          const response = await fetch("https://task-managementtask6.vercel.app/tasks/statistics", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -25,7 +25,6 @@ const Dashboard = () => {
             },
           });
           const data = await response.json();
-
           if (response.ok) {
             if(data.message)
             {

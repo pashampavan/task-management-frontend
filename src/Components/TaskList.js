@@ -50,7 +50,7 @@ const TaskList = () => {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get("https://task-managementtask6.vercel.app//tasks", {
+      const response = await axios.get("https://task-managementtask6.vercel.app/tasks", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       if(response.data.length !== 0) {
@@ -107,7 +107,7 @@ const TaskList = () => {
       if (editMode) {
         // Edit Task
         await axios.put(
-          `https://task-managementtask6.vercel.app//tasks/${currentTaskId}`,
+          `https://task-managementtask6.vercel.app/tasks/${currentTaskId}`,
           {
             ...newTask,
             status: newTask.status ? "Finished" : "Pending",
@@ -119,7 +119,7 @@ const TaskList = () => {
       } else {
         // Add Task
         await axios.post(
-          "https://task-managementtask6.vercel.app//tasks",
+          "https://task-managementtask6.vercel.app/tasks",
           {
             ...newTask,
             status: newTask.status ? "Finished" : "Pending",
@@ -140,7 +140,7 @@ const TaskList = () => {
   // Handle Delete Task
   const handleDeleteTask = async (id) => {
     try {
-      await axios.delete(`https://task-managementtask6.vercel.app//tasks/${id}`, {
+      await axios.delete(`https://task-managementtask6.vercel.app/tasks/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       fetchTasks();
