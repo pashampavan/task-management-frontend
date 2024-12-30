@@ -29,7 +29,7 @@ const SignIn = ({ type }) => {
 
     if (type === "signin") {
       try {
-        const response = await axios.post("http://13.61.23.170:5000/login/", {
+        const response = await axios.post("https://13.61.23.170:5000/login/", {
           email: email,
           password: password
         });
@@ -41,11 +41,12 @@ const SignIn = ({ type }) => {
         setLogin(true);  // Update login context
         navigate('/dashboard');
       } catch (err) {
+        alert(err);
         setError(err.response?.data?.message || "SignIn failed");
       }
     } else {
       try {
-        const response = await axios.post("http://13.61.23.170:5000/register/", {
+        const response = await axios.post("https://13.61.23.170:5000/register/", {
           email: email,
           name: name,
           password: password
