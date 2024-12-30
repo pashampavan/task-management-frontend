@@ -11,8 +11,9 @@ function App() {
     <Context>
     <div className="App">
       <Navbar/>
-      <Routes basename="/" >
+      <Routes >
         <Route  path='/' element={<SignIn type="signin"/>}/>
+        <Route  path='/task-management-frontend' element={<SignIn type="signin"/>}/>
         <Route  path='/dashboard' element={<Dashboard/>}/>
         <Route  path='/tasklist' element={<TaskList/>}/>
         <Route  path='/signup' element={<SignIn type="signup"/>}/>

@@ -1,6 +1,6 @@
 {
   "name": "task_management",
-  "homepage": "https://pashampavan.github.io/task_management",
+  "homepage": "https://pashampavan.github.io/task-management-frontend",
   "version": "0.1.0",
   "private": true,
   "dependencies": {
