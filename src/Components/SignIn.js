@@ -29,7 +29,7 @@ const SignIn = ({ type }) => {
 
     if (type === "signin") {
       try {
-        const response = await axios.post("http://localhost:5000/login/", {
+        const response = await axios.post("http://13.61.23.170:5000/login/", {
           email: email,
           password: password
         });
@@ -45,7 +45,7 @@ const SignIn = ({ type }) => {
       }
     } else {
       try {
-        const response = await axios.post("http://localhost:5000/register/", {
+        const response = await axios.post("http://13.61.23.170:5000/register/", {
           email: email,
           name: name,
           password: password

@@ -48,15 +48,10 @@ const TaskList = () => {
     }
   }, [login]);
 
-  // useEffect(()=>{
-  //   tasks = tasks
-  // .slice() 
-  // .sort((a, b) => a.priority - b.priority);
-  // },)
-  // Fetch tasks
+
   const fetchTasks = async () => {
     try {
-      const response = await axios.get("http://localhost:5000/tasks", {
+      const response = await axios.get("http://13.61.23.170:5000/tasks", {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       setTasks(response.data);
@@ -108,7 +103,7 @@ const TaskList = () => {
       if (editMode) {
         // Edit Task
         await axios.put(
-          `http://localhost:5000/tasks/${currentTaskId}`,
+          `http://13.61.23.170:5000/tasks/${currentTaskId}`,
           {
             ...newTask,
             status: newTask.status ? "Finished" : "Pending",
@@ -120,7 +115,7 @@ const TaskList = () => {
       } else {
         // Add Task
         await axios.post(
-          "http://localhost:5000/tasks",
+          "http://13.61.23.170:5000/tasks",
           {
             ...newTask,
             status: newTask.status ? "Finished" : "Pending",
@@ -141,7 +136,7 @@ const TaskList = () => {
   // Handle Delete Task
   const handleDeleteTask = async (id) => {
     try {
-      await axios.delete(`http://localhost:5000/tasks/${id}`, {
+      await axios.delete(`http://13.61.23.170:5000/tasks/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       fetchTasks();
