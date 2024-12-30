@@ -25,8 +25,9 @@ const Dashboard = () => {
             },
           });
           const data = await response.json();
+          
           if (response.ok) {
-            if(data.message)
+            if(data.message=="No tasks found for this user")
             {
               navigate('/tasklist')
             }

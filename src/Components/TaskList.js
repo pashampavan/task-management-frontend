@@ -24,7 +24,7 @@ import {
 import axios from "axios";
 
 const TaskList = () => {
-  const { login } = useContext(context);
+  const { handleClick, login, setLogin, open, setOpen, message, setMessage, severity, setSeverity } = useContext(context);
   const navigate = useNavigate();
 
   // State variables
@@ -56,8 +56,12 @@ const TaskList = () => {
       if(response.data.length !== 0) {
         setTasks(response.data);
       }
+      else
+      {
+        setTasks(null);
+      }
     } catch (error) {
-      console.error("Error fetching tasks:", error);
+      handleClick('error','Server is not responding please try gain later!');
     }
   };
 
@@ -101,6 +105,10 @@ const TaskList = () => {
   // Handle Add/Edit Task
   const handleSaveTask = async () => {
     try {
+      if(!newTask.title || !newTask.priority || ! newTask.start || newTask.end)
+      {
+        throw new Error("Enter all fields!");
+      }
       if (newTask.start > newTask.end) {
         throw new Error("Start time should not be greater than end time!");
       }
@@ -131,9 +139,9 @@ const TaskList = () => {
       }
       fetchTasks();
       handleDialogClose();
+      handleClick('success','Task saved successfully!');
     } catch (error) {
-      alert("Error saving task: " + error.message);
-      console.error("Error saving task:", error);
+      handleClick('error',error.message);
     }
   };
 
@@ -144,8 +152,9 @@ const TaskList = () => {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       fetchTasks();
+      handleClick('success','Task deleted successfully!');
     } catch (error) {
-      console.error("Error deleting task:", error);
+      handleClick('error','Unable to delete!');
     }
   };
 
@@ -276,9 +285,21 @@ const TaskList = () => {
             </Grid>
           ))
         ) : (
-          <Box sx={{ textAlign: "center", width: "100%" }}>
-            <Typography variant="h6">Please add tasks!</Typography>
-          </Box>
+          <Box 
+  sx={{ 
+    display: 'flex', 
+    justifyContent: 'center', 
+    alignItems: 'center', 
+    width: '100vw', 
+    height: '100vh', // Success green background color
+    color: 'black', 
+    textAlign: 'center'
+  }}
+>
+  <Typography variant="h4" sx={{ fontWeight: 'bold' }}>
+    Please add tasks!
+  </Typography>
+</Box>
         )}
       </Grid>
 
