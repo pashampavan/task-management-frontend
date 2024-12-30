@@ -2,15 +2,12 @@ import React, { useEffect, useContext, useState } from "react";
 import { Box, Typography, Grid, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Paper } from "@mui/material";
 import { useNavigate } from "react-router-dom";
 import context from "../Context/useContext";
-
+import CircularProgress from '@mui/material/CircularProgress';
 const Dashboard = () => {
   const navigate = useNavigate();
   const { login, setLogin } = useContext(context);
-  const [statistics, setStatistics] = useState({
-    summaryData: [],
-    pendingSummaryData: [],
-    taskPriorityData: [],
-  });
+  const [statistics, setStatistics] = useState(null);
+  const [nodata,setNodata] = useState(false);
 
   useEffect(() => {
     // Check for authentication
@@ -20,7 +17,7 @@ const Dashboard = () => {
       // Fetch user statistics
       const fetchStatistics = async () => {
         try {
-          const response = await fetch("https://task-managementtask6.vercel.app/tasks/statistics", {
+          const response = await fetch("http://localhost:5000/tasks/statistics", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
@@ -28,7 +25,12 @@ const Dashboard = () => {
             },
           });
           const data = await response.json();
+
           if (response.ok) {
+            if(data.message)
+            {
+              navigate('/tasklist')
+            }
             // Map API data to match the UI structure
             setStatistics({
               summaryData: [
@@ -62,7 +64,9 @@ const Dashboard = () => {
   }, [login, navigate]);
 
   return (
-    <Box sx={{ p: 3 }}>
+    <>
+    {
+      statistics?<Box sx={{ p: 3 }}>
       {/* Summary Section */}
       <Typography variant="h4" gutterBottom>
         Dashboard
@@ -135,7 +139,25 @@ const Dashboard = () => {
           </Table>
         </TableContainer>
       </Box>
+    </Box>:
+    <>
+     <Box
+      sx={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+      }}
+    >
+      <CircularProgress />
     </Box>
+
+    
+    </>
+
+    }
+
+    </>
   );
 };
 
