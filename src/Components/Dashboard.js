@@ -20,7 +20,7 @@ const Dashboard = () => {
       // Fetch user statistics
       const fetchStatistics = async () => {
         try {
-          const response = await fetch("http://13.61.23.170:5000/tasks/statistics", {
+          const response = await fetch("https://task-managementtask6.vercel.app/tasks/statistics", {
             method: "GET",
             headers: {
               "Content-Type": "application/json",
