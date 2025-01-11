@@ -15,7 +15,7 @@ const SignIn = ({ type }) => {
         setEmail("");
         setPassword("");
     if (localStorage.getItem('token')) {
-      navigate('/dashboard'); // Redirect if already logged in
+      navigate('/events'); // Redirect if already logged in
     }
   }, [type]);
 
@@ -33,7 +33,7 @@ const SignIn = ({ type }) => {
 
     if (type === "signin") {
       try {
-        const response = await axios.post("https://task-managementtask6.vercel.app/login/", {
+        const response = await axios.post("http://localhost:5000/login/", {
           email: email,
           password: password
         });
@@ -51,7 +51,7 @@ const SignIn = ({ type }) => {
       }
     } else {
       try {
-        const response = await axios.post("https://task-managementtask6.vercel.app/register/", {
+        const response = await axios.post("http://localhost:5000/register/", {
           email: email,
           name: name,
           password: password

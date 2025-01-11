@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import context from "../Context/useContext";
+import { useParams } from "react-router-dom";
 import {
   Box,
   Button,
@@ -24,6 +25,7 @@ import {
 import axios from "axios";
 
 const TaskList = () => {
+  const { event_id } = useParams();
   const { handleClick, login, setLogin, open, setOpen, message, setMessage, severity, setSeverity } = useContext(context);
   const navigate = useNavigate();
 
@@ -33,13 +35,13 @@ const TaskList = () => {
   const [editMode, setEditMode] = useState(false);
   const [currentTaskId, setCurrentTaskId] = useState(null);
   const [newTask, setNewTask] = useState({
+    event_id:event_id,
     title: "",
     priority: 1,
     status: false,
     start: "",
     end: "",
   });
-
   useEffect(() => {
     if (!localStorage.getItem("token")) {
       navigate("/");
@@ -50,8 +52,9 @@ const TaskList = () => {
 
   const fetchTasks = async () => {
     try {
-      const response = await axios.get("https://task-managementtask6.vercel.app/tasks", {
-        headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
+      const response = await axios.get("http://localhost:5000/tasks", {
+        headers: {Authorization:`Bearer ${localStorage.getItem("token")}`},
+        params: { event_id }
       });
       if(response.data.length !== 0) {
         setTasks(response.data);
@@ -62,6 +65,7 @@ const TaskList = () => {
       }
     } catch (error) {
       handleClick('error','Server is not responding please try gain later!');
+      localStorage.removeItem('token');
     }
   };
 
@@ -71,6 +75,7 @@ const TaskList = () => {
       setEditMode(true);
       setCurrentTaskId(task._id);
       setNewTask({
+        event_id:event_id,
         title: task.title,
         priority: task.priority,
         status: task.status === "Finished",
@@ -80,6 +85,7 @@ const TaskList = () => {
     } else {
       setEditMode(false);
       setNewTask({
+        event_id:event_id,
         title: "",
         priority: 1,
         status: false,
@@ -93,6 +99,7 @@ const TaskList = () => {
   const handleDialogClose = () => {
     setOpenDialog(false);
     setNewTask({
+      event_id:event_id,
       title: "",
       priority: 1,
       status: false,
@@ -105,7 +112,7 @@ const TaskList = () => {
   // Handle Add/Edit Task
   const handleSaveTask = async () => {
     try {
-      if(!newTask.title || !newTask.priority || ! newTask.start || newTask.end)
+      if(!newTask.title || !newTask.priority || ! newTask.start || !newTask.end)
       {
         throw new Error("Enter all fields!");
       }
@@ -115,7 +122,7 @@ const TaskList = () => {
       if (editMode) {
         // Edit Task
         await axios.put(
-          `https://task-managementtask6.vercel.app/tasks/${currentTaskId}`,
+          `http://localhost:5000/tasks/${currentTaskId}`,
           {
             ...newTask,
             status: newTask.status ? "Finished" : "Pending",
@@ -127,10 +134,10 @@ const TaskList = () => {
       } else {
         // Add Task
         await axios.post(
-          "https://task-managementtask6.vercel.app/tasks",
+          "http://localhost:5000/tasks",
           {
             ...newTask,
-            status: newTask.status ? "Finished" : "Pending",
+            status: newTask.status ? "Finished" : "Pending"
           },
           {
             headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
@@ -148,7 +155,7 @@ const TaskList = () => {
   // Handle Delete Task
   const handleDeleteTask = async (id) => {
     try {
-      await axios.delete(`https://task-managementtask6.vercel.app/tasks/${id}`, {
+      await axios.delete(`http://localhost:5000/tasks/${id}`, {
         headers: { Authorization: `Bearer ${localStorage.getItem("token")}` },
       });
       fetchTasks();
@@ -186,7 +193,9 @@ const TaskList = () => {
     const sortedByPriority = tasks.slice().sort((a, b) => b.priority - a.priority);
     setTasks(sortedByPriority);
   };
-
+  const handleAttendess=(task_id)=>{
+    navigate(`/attendees/${task_id}`);
+  }
   return (
     <Box sx={{ p: 3 }}>
       <Stack
@@ -278,6 +287,9 @@ const TaskList = () => {
                     </Button>
                     <Button size="small" variant="outlined" color="error" onClick={() => handleDeleteTask(task._id)}>
                       Delete
+                    </Button>
+                    <Button size="small" variant="outlined" color="success" onClick={() => handleAttendess(task._id)}>
+                      Attendees
                     </Button>
                   </Stack>
                 </CardContent>

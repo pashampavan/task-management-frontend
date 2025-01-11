@@ -11,6 +11,7 @@ const Navbar = () => {
   const navigate = useNavigate();
 
   useEffect(() => {
+    // localStorage.removeItem("token");
     if (localStorage.getItem('token')) {
       setLogin(true);
     } else {
@@ -49,14 +50,24 @@ const Navbar = () => {
                   Home
                 </Link>
               </Typography>
-              <Typography variant="h6" component="div" sx={{ cursor: "pointer" }}>
+              {/* <Typography variant="h6" component="div" sx={{ cursor: "pointer" }}>
                 <Link to='/dashboard' style={{ textDecoration: "none", color: "white" }}>
                   Dashboard
                 </Link>
-              </Typography>
-              <Typography variant="h6" component="div" sx={{ cursor: "pointer" }}>
+              </Typography> */}
+              {/* <Typography variant="h6" component="div" sx={{ cursor: "pointer" }}>
                 <Link to='/tasklist' style={{ textDecoration: "none", color: "white" }}>
                   Task List
+                </Link>
+              </Typography> */}
+              {/* <Typography variant="h6" component="div" sx={{ cursor: "pointer" }}>
+                <Link to='/tasklist' style={{ textDecoration: "none", color: "white" }}>
+                  Task List
+                </Link>
+              </Typography> */}
+              <Typography variant="h6" component="div" sx={{ cursor: "pointer" }}>
+                <Link to='/events' style={{ textDecoration: "none", color: "white" }}>
+                  Events
                 </Link>
               </Typography>
             </Box>
@@ -113,12 +124,12 @@ const Navbar = () => {
             <ListItem button>
               <ListItemText primary={<Link to="/" style={{ textDecoration: 'none' }}>Home</Link>} />
             </ListItem>
-            <ListItem button>
+            {/* <ListItem button>
               <ListItemText primary={<Link to="/dashboard" style={{ textDecoration: 'none' }}>Dashboard</Link>} />
-            </ListItem>
-            <ListItem button>
+            </ListItem> */}
+            {/* <ListItem button>
               <ListItemText primary={<Link to="/tasklist" style={{ textDecoration: 'none' }}>Task List</Link>} />
-            </ListItem>
+            </ListItem> */}
             {login ? (
               <ListItem button>
                 <ListItemText
