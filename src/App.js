@@ -19,7 +19,6 @@ function App() {
             {/* Default route */}
             <Route path="/" element={<SignIn type="signin" />} />
             {/* Routes for other paths */}
-            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/tasklist/:event_id" element={<TaskList />} />
             <Route path="/signup" element={<SignIn type="signup" />} />
             <Route path="/events" element={<AllEvents />} />

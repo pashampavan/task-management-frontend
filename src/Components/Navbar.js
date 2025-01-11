@@ -41,7 +41,7 @@ const Navbar = () => {
         <Toolbar sx={{ justifyContent: "space-between" }}>
           {/* Left Section (Logo and Links) */}
           <Box sx={{ display: "flex", gap: 2, alignItems: "center" }}>
-            <img style={{ height: "50px", width: "100px" }} src="https://i.graphicmama.com/uploads/2019/3/5c81d12ca5c93-Tasks%20Management%20Logo%20Design.jpg" alt="Logo" />
+            <img style={{ height: "50px", width: "100px" }} src="https://cdn.vectorstock.com/i/1000x1000/98/01/windmill-event-management-logo-vector-29969801.webp" alt="Logo" />
             
             {/* Desktop/Tablet Links */}
             <Box sx={{ display: { xs: 'none', sm: 'flex' }, gap: 2 }}>
@@ -95,6 +95,7 @@ const Navbar = () => {
                   localStorage.removeItem("token");
                   setLogin(false);
                   handleClick('success', 'SignOut successfully!');
+                  navigate('/');
                 }}
               >
                 <span>Sign Out</span>
@@ -138,6 +139,7 @@ const Navbar = () => {
                     localStorage.removeItem("token");
                     setLogin(false);
                     handleClick('success', 'SignOut successfully!');
+                    navigate('/');
                   }}
                 />
               </ListItem>
